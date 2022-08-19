@@ -27,9 +27,11 @@ export default class NestedModal extends Component {
         super(props)
         this.state = {
             open: false,
-            id: uuid(),
+            id: '',
+            current_id: localStorage.getItem("current_id") ? JSON.parse(localStorage.getItem("current_id")) : 0,
             name: "",
             description: "",
+            error: '',
             users: []
         };
     };
@@ -60,37 +62,48 @@ export default class NestedModal extends Component {
     };
 
     handleSubmit = (e) => {
+        console.log('namess', this.state.name)
         e.preventDefault()
-        console.log('hi')
-
         // setting an object
         const user = {
-            id: uuid(),
+            id: this.state.current_id + 1,
             name: this.state.name,
             description: this.state.description
         };
-
         // add new user with existing users
+        const validName = this.state.users.find(x => x.name === this.state.name)
+        if (validName) {
+            alert("User already added")
+        }
+        else {
+            this.setState(prevState => ({
+                users: [...prevState.users, user],
+                open: false,
+                name: "",
+                description: "",
+            }))
+            localStorage.setItem("users", JSON.stringify(this.state.users));
+            localStorage.setItem('current_id', JSON.stringify(this.state.current_id + 1))
+        }
 
-        const new_values = [...this.state.users, user];
+        // const new_values = [...this.state.users, user]
 
-        // after updating, change the dialog box into empty and updated value stored with old items.
-
-        this.setState({
-            users: new_values,
-            open: false,
-            name: "",
-            description: ""
-        }, () => {
-            localStorage.setItem("users", JSON.stringify(new_values));
-        });
-
+        // // after updating, change the dialog box into empty and updated new value with old items.
+        // this.setState({
+        //     users: this.state.users,
+        //     open: false,
+        //     name: "",
+        //     description: "",
+        // }, () => {
+        //    
+        // });
     }
 
     render() {
+        console.log('----total---->', this.state.users)
         return (
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleOpen}>Add User</Button>
+                <Button variant="contained" color="primary" onClick={this.handleOpen} >Add User</Button>
                 <Modal
                     open={this.state.open}
                     onClose={this.handleClose}
@@ -127,7 +140,7 @@ export default class NestedModal extends Component {
                             </Grid>
                             {/* <Grid helperText={setError}></Grid> */}
                             <Grid marginTop='10px' display='flex' justifyContent='center'>
-                                <Button type="submit" variant="contained" >Add User </Button>
+                                <Button type="submit" variant="contained" users={this.state.users} handleSubmit={this.handleSubmit}>Add User </Button>
                             </Grid>
                         </form>
                     </Box>

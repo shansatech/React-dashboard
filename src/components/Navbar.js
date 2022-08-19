@@ -4,7 +4,7 @@ import { SidebarData } from './SidebarData'
 import './Navbar.css'
 import * as FaIcons from 'react-icons/fa'
 import { AppBar, Typography, Toolbar, Grid } from '@mui/material'
-import NestedModal from './Model';
+// import NestedModal from './Model';
 
 
 export class Navbar extends Component {
@@ -19,35 +19,38 @@ export class Navbar extends Component {
 
     submit = () => {
         this.setState(
-
         )
     }
 
     render() {
         return (
             <div>
-                <AppBar style={{ position: 'relative', background: 'linear-gradient(45deg, #332e36, #80b6c7 )', borderRadius: '25px' }}>
+                <AppBar style={{ position: 'fixed', background: 'linear-gradient(45deg, #332e36, #80b6c7 )', borderRadius: '25px' }}>
                     <Toolbar style={{ justifyContent: 'space-between', size: '30px' }}>
                         <Link to='#' className='menu-bars'>
                             <FaIcons.FaBars />
                         </Link>
                         <Typography variant='h4'>Dashboard</Typography>
-                        <Grid style={{ display: 'flex', justifyContent: 'space-between', size: '30px' }}>
-                            <NestedModal />
-                        </Grid>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', size: '30px' }}>
+                            {/* <NestedModal /> */}
+                        </div>
                     </Toolbar>
-                    <Grid width='20%'>
-                        {SidebarData.map((item, index) => {
-                            return (
-                                <li key={index} className={item.className}>
-                                    <Link to={item.path}>
-                                        {item.icon}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </li>
-                            )
-                        })}
-                    </Grid>
+                    <div style={{ position: 'fixed', background: 'linear-gradient(45deg, #88cc90, #80b6c7 )', height: '100%', width: '25%', borderRadius: '5px', top: '70px' }}>
+                        <Grid >
+                            {SidebarData.map((item, index) => {
+                                return (
+                                    <div >
+                                        <li key={index} className={item.className}>
+                                            <Link to={item.path}>
+                                                {item.icon}
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </li>
+                                    </div>
+                                )
+                            })}
+                        </Grid>
+                    </div>
                 </AppBar>
             </div>
         )
