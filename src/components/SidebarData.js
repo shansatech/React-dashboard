@@ -3,6 +3,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import HelpIcon from '@mui/icons-material/Help';
 import HomeIcon from '@mui/icons-material/Home';
+import PersonIcon from '@mui/icons-material/Person';
 
 export const SidebarData = [
     {
@@ -15,6 +16,12 @@ export const SidebarData = [
         title: 'User Info',
         path: '/user-info',
         icon: <HelpIcon />,
+        className: 'nav-text'
+    },
+    {
+        title: 'User Type',
+        path: '/user-type',
+        icon: <PersonIcon />,
         className: 'nav-text'
     },
     {

@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 export class Settings extends Component {
     render() {
         return (
-            <div className='settings'>Settings</div>
+            <div className='settings center'>Settings</div>
         )
     }
 }

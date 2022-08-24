@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import userInfo from './Users'
 import { v4 as uuid } from 'uuid';
-import { TableBody, TableCell, TableHead, Typography, TableRow, Table } from '@mui/material';
+import { TableCell, TableHead, Typography, TableRow, Table } from '@mui/material';
 import NestedModal from '../components/Model';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -23,41 +23,41 @@ const style = {
     pb: 3,
 };
 
-export class UserInfo extends Component {
+export class UserType extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
             open: false,
             id: '',
-            current_id: localStorage.getItem("current_id") ? JSON.parse(localStorage.getItem("current_id")) : 0,
+            present_id: localStorage.getItem("present_id") ? JSON.parse(localStorage.getItem("present_id")) : 0,
             name: "",
             description: "",
             error: '',
             counter: 0,
-            users: []
+            persons: []
         };
     };
 
     componentDidMount() {
         this.setState({
-            users: JSON.parse(localStorage.getItem("users")) || [],
+            persons: JSON.parse(localStorage.getItem("persons")) || [],
             // counter: JSON.parse(localStorage.setItem('counter', 1)) || 1
-            // current_id: JSON.parse(localStorage.getItem("current_id")) || 0
+            // present_id: JSON.parse(localStorage.getItem("present_id")) || 0
         });
     };
 
     componentDidUpdate(prevProps, prevState) {
         console.log('prevState::', prevState)
 
-        if (prevState.current_id !== this.state.current_id) {
+        if (prevState.present_id !== this.state.present_id) {
             this.renderUserList()
         }
     }
 
 
     renderUserList() {
-        return this.state.users.length > 0 && this.state.users.map(({ name, description, id }) => (
+        return this.state.persons.length > 0 && this.state.persons.map(({ name, description, id }) => (
             <TableRow key={id} >
                 <TableCell>{id}</TableCell>
                 <TableCell style={{ textTransform: 'capitalize' }}>{name}</TableCell>
@@ -89,28 +89,28 @@ export class UserInfo extends Component {
         e.preventDefault()
         // setting an object
 
-        const user = {
-            id: this.state.current_id + 1,
+        const person = {
+            id: this.state.present_id + 1,
             name: this.state.name.toLowerCase(),
             description: this.state.description
         };
-        console.log('user::', user)
-        // add new user with existing users
-        // const new_values = [...this.state.users, user]
-        const validName = this.state.users.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
+        console.log('user::', person)
+        // add new user with existing persons
+        // const new_values = [...this.state.persons, user]
+        const validName = this.state.persons.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
         if (validName) {
             alert("User already added")
         }
         else {
             this.setState(prevState => ({
-                users: [...prevState.users, user],
+                persons: [...prevState.persons, person],
                 open: false,
                 name: "",
                 description: "",
-                current_id: this.state.current_id + 1
+                present_id: this.state.present_id + 1
             }), () => {
-                localStorage.setItem("users", JSON.stringify(this.state.users));
-                localStorage.setItem('current_id', this.state.current_id)
+                localStorage.setItem("persons", JSON.stringify(this.state.persons));
+                localStorage.setItem('present_id', this.state.present_id)
             })
         }
     }
@@ -130,18 +130,18 @@ export class UserInfo extends Component {
     //         },
     //             () => {
     //                 localStorage.setItem("users", JSON.stringify(this.state.users));
-    //                 localStorage.setItem('current_id', JSON.stringify(this.state.current_id + 1))
+    //                 localStorage.setItem('present_id', JSON.stringify(this.state.present_id + 1))
     //             }))
     //     }
 
     // }
 
     render() {
-        console.log('current id:', this.state.current_id)
+        console.log('current id:', this.state.present_id)
         return (
             <div className='user'>
                 <div className='user-info'>
-                    <Button variant="contained" color="primary" size='small' onClick={this.handleOpen}>Add User</Button>
+                    <Button variant="contained" color="primary" size='small' onClick={this.handleOpen}>Add Person</Button>
                     <Modal
                         open={this.state.open}
                         onClose={this.handleClose}
@@ -215,4 +215,4 @@ export class UserInfo extends Component {
     }
 }
 
-export default UserInfo
+export default UserType

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import Settings from './pages/Settings';
 import { UserInfo } from './pages/UserInfo';
+import UserType from './pages/UserType';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/user-info' element={<UserInfo />} />
         <Route path='/products' element={<Products />} />
         <Route path='/settings' element={<Settings />} />
+        <Route path='/user-type' element={<UserType />} />
       </Routes>
 
     </>
