@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import userInfo from './Users'
 import { v4 as uuid } from 'uuid';
-import { TableCell, TableHead, Typography, TableRow, Table } from '@mui/material';
+import { TableBody, MenuItem, TableCell, InputLabel, Select, TableHead, Typography, TableRow, Table } from '@mui/material';
 import NestedModal from '../components/Model';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import { TextField, Grid } from '@mui/material';
+
 
 
 const style = {
@@ -23,46 +24,48 @@ const style = {
     pb: 3,
 };
 
-export class UserType extends Component {
+export class UserInfo extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
             open: false,
             id: '',
-            present_id: localStorage.getItem("present_id") ? JSON.parse(localStorage.getItem("present_id")) : 0,
-            name: "",
-            description: "",
+            usertype_id: localStorage.getItem("usertype_id") ? JSON.parse(localStorage.getItem("usertype_id")) : 0,
+            type: "",
+            explanation: "",
             error: '',
             counter: 0,
-            persons: []
+            details: [],
         };
     };
 
     componentDidMount() {
         this.setState({
-            persons: JSON.parse(localStorage.getItem("persons")) || [],
+            details: JSON.parse(localStorage.getItem("details")) || [],
             // counter: JSON.parse(localStorage.setItem('counter', 1)) || 1
-            // present_id: JSON.parse(localStorage.getItem("present_id")) || 0
+            // usertype_id: JSON.parse(localStorage.getItem("usertype_id")) || 0
         });
     };
 
     componentDidUpdate(prevProps, prevState) {
         console.log('prevState::', prevState)
 
-        if (prevState.present_id !== this.state.present_id) {
+        if (prevState.usertype_id !== this.state.usertype_id) {
             this.renderUserList()
         }
     }
 
 
     renderUserList() {
-        return this.state.persons.length > 0 && this.state.persons.map(({ name, description, id }) => (
-            <TableRow key={id} >
-                <TableCell>{id}</TableCell>
-                <TableCell style={{ textTransform: 'capitalize' }}>{name}</TableCell>
-                <TableCell>{description}</TableCell>
-            </TableRow>
+        return this.state.details.length > 0 && this.state.details.map(({ type, explanation, id }) => (
+            <TableBody>
+                <TableRow key={id} >
+                    <TableCell>{id}</TableCell>
+                    <TableCell style={{ textTransform: 'uppercase' }}>{type}</TableCell>
+                    <TableCell>{explanation}</TableCell>
+                </TableRow>
+            </TableBody>
         ))
     }
 
@@ -85,32 +88,41 @@ export class UserType extends Component {
         });
     };
 
+    handleChange = (e) => {
+        console.log("HI")
+        this.setState({
+            usertype: e.target.value
+        })
+        console.log("--------------->", e.target.value)
+    };
+
     handleSubmit = (e) => {
         e.preventDefault()
         // setting an object
 
-        const person = {
-            id: this.state.present_id + 1,
-            name: this.state.name.toLowerCase(),
-            description: this.state.description
+        const detail = {
+            id: this.state.usertype_id + 1,
+            type: this.state.type.toUpperCase(),
+            explanation: this.state.explanation,
         };
-        console.log('user::', person)
-        // add new user with existing persons
-        // const new_values = [...this.state.persons, user]
-        const validName = this.state.persons.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
+        console.log('detail::--------->', detail)
+        // add new detail with existing details
+        // const new_values = [...this.state.details, detail]
+        const validName = this.state.details.find(x => x.type.toUpperCase() === this.state.type.toUpperCase())
         if (validName) {
-            alert("User already added")
+            alert("detail already added")
         }
         else {
             this.setState(prevState => ({
-                persons: [...prevState.persons, person],
+                details: [...prevState.details, detail],
                 open: false,
-                name: "",
-                description: "",
-                present_id: this.state.present_id + 1
+                type: "",
+                explanation: "",
+                usertype: "",
+                usertype_id: this.state.usertype_id + 1
             }), () => {
-                localStorage.setItem("persons", JSON.stringify(this.state.persons));
-                localStorage.setItem('present_id', this.state.present_id)
+                localStorage.setItem("details", JSON.stringify(this.state.details));
+                localStorage.setItem('usertype_id', this.state.usertype_id)
             })
         }
     }
@@ -130,18 +142,18 @@ export class UserType extends Component {
     //         },
     //             () => {
     //                 localStorage.setItem("users", JSON.stringify(this.state.users));
-    //                 localStorage.setItem('present_id', JSON.stringify(this.state.present_id + 1))
+    //                 localStorage.setItem('current_id', JSON.stringify(this.state.current_id + 1))
     //             }))
     //     }
 
     // }
 
     render() {
-        console.log('current id:', this.state.present_id)
+
         return (
             <div className='user'>
                 <div className='user-info'>
-                    <Button variant="contained" color="primary" size='small' onClick={this.handleOpen}>Add Person</Button>
+                    <Button variant="contained" color="primary" size='small' onClick={this.handleOpen}>Add User</Button>
                     <Modal
                         open={this.state.open}
                         onClose={this.handleClose}
@@ -156,28 +168,28 @@ export class UserType extends Component {
                                     direction="column"
                                     justify="center"
                                 >
-                                    <Typography htmlFor="name">Name: </Typography>
+                                    <Typography htmlFor="name">User Type: </Typography>
                                     <TextField
                                         type="text"
                                         required
-                                        name="name"
-                                        id="name"
-                                        placeholder="Enter your Name"
-                                        value={this.state.name}
+                                        name="type"
+                                        id="type"
+                                        placeholder="Enter User Type"
+                                        value={this.state.type}
                                         onChange={this.handleInputChange}
                                     />
                                 </Grid>
                                 <Grid container
                                     direction="column"
                                     justify="center">
-                                    <Typography htmlFor="text">Job Description: </Typography>
+                                    <Typography htmlFor="text">Explanation: </Typography>
                                     <TextField
                                         type="text"
                                         required
-                                        name="description"
-                                        id="description"
-                                        placeholder="Enter your Job Description"
-                                        value={this.state.description}
+                                        name="explanation"
+                                        id="explanation"
+                                        placeholder="Enter your Explanation"
+                                        value={this.state.explanation}
                                         onChange={this.handleInputChange}
                                     />
                                 </Grid>
@@ -193,8 +205,8 @@ export class UserType extends Component {
                         <TableHead>
                             <TableRow className='user-head'>
                                 <TableCell >ID</TableCell>
-                                <TableCell >Name</TableCell>
-                                <TableCell >Job Description</TableCell>
+                                <TableCell >User Type</TableCell>
+                                <TableCell >Explanation</TableCell>
                             </TableRow>
                         </TableHead>
                         {/* {userInfo.length !== 0 ? <TableBody>
@@ -215,4 +227,4 @@ export class UserType extends Component {
     }
 }
 
-export default UserType
+export default UserInfo

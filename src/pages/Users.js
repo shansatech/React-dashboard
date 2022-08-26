@@ -1,28 +1,18 @@
 const userInfo = [
     {
-        id: '#1',
-        name: "Vignesh",
-        description: 'Software Deveoper'
+        type: 'Admin'
     },
     {
-        id: '#2',
-        name: "Rajesh",
-        description: 'Senior System Engineer'
+        type: 'ISO'
     },
     {
-        id: '#3',
-        name: "Jessie",
-        description: 'Automated Tester'
+        type: 'Sub-ISO'
     },
     {
-        id: '#4',
-        name: "Thushar",
-        description: 'Database Architect'
+        type: 'Operator'
     },
     {
-        id: '#5',
-        name: "Shyam",
-        description: 'Human Resource'
+        type: 'Merchant'
     },
 ]
 

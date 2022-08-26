@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import userInfo from './Users'
-import { v4 as uuid } from 'uuid';
-import { TableBody, TableCell, TableHead, Typography, TableRow, Table } from '@mui/material';
-import NestedModal from '../components/Model';
+import { TableBody, MenuItem, TableCell, InputLabel, Select, TableHead, Typography, TableRow, Table } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import { TextField, Grid } from '@mui/material';
+
 
 
 const style = {
@@ -23,6 +21,8 @@ const style = {
     pb: 3,
 };
 
+const useInfo = localStorage.getItem('details') ? JSON.parse(localStorage.getItem('details')) : []
+
 export class UserInfo extends Component {
 
     constructor(props) {
@@ -33,9 +33,10 @@ export class UserInfo extends Component {
             current_id: localStorage.getItem("current_id") ? JSON.parse(localStorage.getItem("current_id")) : 0,
             name: "",
             description: "",
-            error: '',
             counter: 0,
-            users: []
+            users: [],
+            usertype: '',
+            editId: null,
         };
     };
 
@@ -55,15 +56,33 @@ export class UserInfo extends Component {
         }
     }
 
-
     renderUserList() {
-        return this.state.users.length > 0 && this.state.users.map(({ name, description, id }) => (
-            <TableRow key={id} >
-                <TableCell>{id}</TableCell>
-                <TableCell style={{ textTransform: 'capitalize' }}>{name}</TableCell>
-                <TableCell>{description}</TableCell>
-            </TableRow>
+        return this.state.users.length > 0 && this.state.users.map(({ id, name, description, usertype }, i) => (
+            <TableBody>
+                <TableRow key={id} >
+                    <TableCell>{id}</TableCell>
+                    <TableCell style={{ textTransform: 'capitalize' }}>{name}</TableCell>
+                    <TableCell>{description}</TableCell>
+                    <TableCell style={{ textTransform: 'uppercase' }}>{usertype}</TableCell>
+                    <Button variant='contained' onClick={() => this.handleEditOpen(id, name, description, usertype, i)}>Edit</Button>
+                    <Button variant='contained' color='secondary'>Delete</Button>
+                </TableRow>
+            </TableBody>
         ))
+    }
+
+    handleEditOpen = (id, name, description, usertype, i) => {
+        console.log("==============>", i)
+        this.setState(() => ({
+            open: true,
+            name: name,
+            description: description,
+            usertype: usertype,
+        }))
+    }
+
+    handleEdit = (e) => {
+        e.preventDefault()
     }
 
     handleOpen = () => {
@@ -85,6 +104,12 @@ export class UserInfo extends Component {
         });
     };
 
+    handleChange = (e) => {
+        this.setState({
+            usertype: e.target.value
+        })
+    };
+
     handleSubmit = (e) => {
         e.preventDefault()
         // setting an object
@@ -92,9 +117,10 @@ export class UserInfo extends Component {
         const user = {
             id: this.state.current_id + 1,
             name: this.state.name.toLowerCase(),
-            description: this.state.description
+            description: this.state.description,
+            usertype: this.state.usertype
         };
-        console.log('user::', user)
+        console.log('user::--------->', user)
         // add new user with existing users
         // const new_values = [...this.state.users, user]
         const validName = this.state.users.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
@@ -107,6 +133,7 @@ export class UserInfo extends Component {
                 open: false,
                 name: "",
                 description: "",
+                usertype: "",
                 current_id: this.state.current_id + 1
             }), () => {
                 localStorage.setItem("users", JSON.stringify(this.state.users));
@@ -138,6 +165,8 @@ export class UserInfo extends Component {
 
     render() {
         console.log('current id:', this.state.current_id)
+
+        console.log(useInfo)
         return (
             <div className='user'>
                 <div className='user-info'>
@@ -181,6 +210,36 @@ export class UserInfo extends Component {
                                         onChange={this.handleInputChange}
                                     />
                                 </Grid>
+                                <Grid container
+                                    direction="column"
+                                    justify="center">
+                                    {/* <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
+                                    <Select
+                                        displayEmpty
+                                        values={this.state.values}
+                                        onChange={this.handleChange}
+                                    >
+                                        {userInfo.map((user, index) => (
+                                            <MenuItem key={index} >
+                                                {user.type}
+                                            </MenuItem>
+                                        ))}
+                                    </Select> */}
+                                    <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
+                                    <Select
+                                        onChange={this.handleChange}
+                                        // onChange={() => console.log('test')}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        {useInfo.map(({ type, index }) => (
+                                            <MenuItem key={index} value={type} style={{ textTransform: 'uppercase' }}>
+                                                {type}
+                                            </MenuItem>
+                                        ))}
+                                        {console.log("---------------->", this.state.details)}
+                                    </Select>
+                                </Grid>
                                 {/* <Grid helperText={setError}></Grid> */}
                                 <Grid marginTop='10px' display='flex' justifyContent='center'>
                                     <Button type="submit" variant="contained">Add User </Button>
@@ -195,6 +254,7 @@ export class UserInfo extends Component {
                                 <TableCell >ID</TableCell>
                                 <TableCell >Name</TableCell>
                                 <TableCell >Job Description</TableCell>
+                                <TableCell >User Type</TableCell>
                             </TableRow>
                         </TableHead>
                         {/* {userInfo.length !== 0 ? <TableBody>
