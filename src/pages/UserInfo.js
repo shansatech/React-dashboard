@@ -5,8 +5,6 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import { TextField, Grid } from '@mui/material';
 
-
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -33,10 +31,13 @@ export class UserInfo extends Component {
             current_id: localStorage.getItem("current_id") ? JSON.parse(localStorage.getItem("current_id")) : 0,
             name: "",
             description: "",
+            usertype: '',
             counter: 0,
             users: [],
-            usertype: '',
-            editId: null,
+            editOpen: false,
+            editName: '',
+            editDescription: '',
+            editUsertype: '',
         };
     };
 
@@ -57,6 +58,9 @@ export class UserInfo extends Component {
     }
 
     renderUserList() {
+        if (this.state.users.length === 0) {
+            return <Typography>No user found</Typography>
+        }
         return this.state.users.length > 0 && this.state.users.map(({ id, name, description, usertype }, i) => (
             <TableBody>
                 <TableRow key={id} >
@@ -64,21 +68,101 @@ export class UserInfo extends Component {
                     <TableCell style={{ textTransform: 'capitalize' }}>{name}</TableCell>
                     <TableCell>{description}</TableCell>
                     <TableCell style={{ textTransform: 'uppercase' }}>{usertype}</TableCell>
-                    <Button variant='contained' onClick={() => this.handleEditOpen(id, name, description, usertype, i)}>Edit</Button>
-                    <Button variant='contained' color='secondary'>Delete</Button>
+                    <Button variant='contained' onClick={() => this.handleEditOpen(id, name, description, usertype)}>Edit</Button>
+                    <Modal
+                        open={this.state.editOpen}
+                        onClose={this.handleClose}
+                        aria-labelledby="parent-modal-title"
+                        aria-describedby="parent-modal-description"
+                    >
+                        <Box sx={{ ...style, width: 400 }}>
+                            <form onSubmit={(e) => this.handleEditSubmit(e)}>
+                                <Typography variant='h4' color='primary' display='flex' justifyContent='center'>Edit User</Typography>
+                                {/* {(error !== '') ? (<div>{error}</div>) : ''} */}
+                                <Grid container
+                                    direction="column"
+                                    justify="center"
+                                >
+                                    <Typography htmlFor="name">Name: </Typography>
+                                    <TextField
+                                        type="text"
+                                        required
+                                        name="editName"
+                                        id="name"
+                                        placeholder="Enter your Name"
+                                        value={this.state.editName}
+                                        onChange={this.handleEditChange}
+                                    />
+                                </Grid>
+                                <Grid container
+                                    direction="column"
+                                    justify="center">
+                                    <Typography htmlFor="text">Job Description: </Typography>
+                                    <TextField
+                                        type="text"
+                                        required
+                                        name="editDescription"
+                                        id="description"
+                                        placeholder="Enter your Job Description"
+                                        value={this.state.editDescription}
+                                        onChange={this.handleEditChange}
+                                    />
+                                </Grid>
+                                <Grid container
+                                    direction="column"
+                                    justify="center">
+                                    {/* <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
+                                    <Select
+                                        displayEmpty
+                                        values={this.state.values}
+                                        onChange={this.handleChange}
+                                    >
+                                        {userInfo.map((user, index) => (
+                                            <MenuItem key={index} >
+                                                {user.type}
+                                            </MenuItem>
+                                        ))}
+                                    </Select> */}
+                                    <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
+                                    <Select
+                                        onChange={this.handleEditChange}
+                                        // onChange={() => console.log('test')}
+                                        name="editUsertype"
+                                        value={this.state.editUsertype}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        {useInfo.map(({ usertype, index }) => (
+                                            <MenuItem key={index} value={usertype} style={{ textTransform: 'uppercase' }}>
+                                                {usertype}
+                                            </MenuItem>
+                                        ))}
+
+                                    </Select>
+                                </Grid>
+                                {/* <Grid helperText={setError}></Grid> */}
+                                <Grid marginTop='10px' display='flex' justifyContent='center'>
+                                    <Button type="submit" variant="contained">Save Changes</Button>
+                                </Grid>
+                            </form>
+                        </Box>
+                    </Modal>
+                    <Button variant='contained' color='secondary' onClick={() => this.handleDelete(id)}>Delete</Button>
                 </TableRow>
-            </TableBody>
+            </TableBody >
         ))
     }
 
-    handleEditOpen = (id, name, description, usertype, i) => {
-        console.log("==============>", i)
+    handleEditOpen = (id, name, description, usertype) => {
+        console.log("==============>", usertype)
         this.setState(() => ({
-            open: true,
-            name: name,
-            description: description,
-            usertype: usertype,
+            editId: id,
+            editOpen: true,
+            editName: name,
+            editDescription: description,
+            editUsertype: usertype,
         }))
+
     }
 
     handleEdit = (e) => {
@@ -93,7 +177,8 @@ export class UserInfo extends Component {
 
     handleClose = () => {
         this.setState({
-            open: false
+            open: false,
+            editOpen: false
         })
     };
 
@@ -102,12 +187,14 @@ export class UserInfo extends Component {
         this.setState({
             [e.target.name]: e.target.value
         });
+
     };
 
-    handleChange = (e) => {
+    handleEditChange = (e) => {
+        // e.preventDefault();
         this.setState({
-            usertype: e.target.value
-        })
+            [e.target.name]: e.target.value
+        });
     };
 
     handleSubmit = (e) => {
@@ -120,7 +207,7 @@ export class UserInfo extends Component {
             description: this.state.description,
             usertype: this.state.usertype
         };
-        console.log('user::--------->', user)
+
         // add new user with existing users
         // const new_values = [...this.state.users, user]
         const validName = this.state.users.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
@@ -142,6 +229,51 @@ export class UserInfo extends Component {
         }
     }
 
+    handleEditSubmit = (e) => {
+        e.preventDefault()
+        // setting an object
+
+        const editUser = {
+            id: this.state.editId,
+            name: this.state.editName.toLowerCase(),
+            description: this.state.editDescription,
+            usertype: this.state.editUsertype,
+        };
+        console.log(">>>>>>>->>>>>>>>>->>>>>>>>", this.state.editUsertype)
+        // add new user with existing users
+        // const new_values = [...this.state.users, user]
+
+        const editName = this.state.users.find(x => x.name.toLowerCase() === this.state.editName.toLowerCase() && x.id !== this.state.editId)
+        const index = this.state.users.findIndex(x => x.id === this.state.editId)
+        // const sameName = this.state.users.find(x => x.name.toLowerCase() === this.state.name.toLowerCase())
+        // console.log("index here", index)
+        // console.log("splice here~~~>", this.state.users.splice(index, 1, editUser))
+
+        if (editName) {
+            alert("User already added")
+        }
+        else {
+            this.state.users.splice(index, 1, editUser)
+            this.setState(({
+                users: this.state.users,
+                editOpen: false,
+                name: "",
+                description: "",
+                usertype: "",
+            }), () => {
+                console.log('state::', this.state.users)
+                localStorage.setItem("users", JSON.stringify(this.state.users));
+            })
+        }
+    }
+
+    handleDelete = (id) => {
+        console.log("kkkkkkkkkkkkkk", id)
+        const deleteUser = this.state.users.filter(x => x.id !== id)
+        this.setState({ users: deleteUser })
+        console.log("--->---->--->", deleteUser)
+    }
+
     // after updating, change the dialog box into empty and updated value stored with old items
 
     //     const validName = this.state.users.find(x => x.name === this.state.name)
@@ -160,13 +292,10 @@ export class UserInfo extends Component {
     //                 localStorage.setItem('current_id', JSON.stringify(this.state.current_id + 1))
     //             }))
     //     }
-
     // }
 
     render() {
-        console.log('current id:', this.state.current_id)
-
-        console.log(useInfo)
+        console.log("editUsertype ====>", this.state.editUsertype)
         return (
             <div className='user'>
                 <div className='user-info'>
@@ -227,17 +356,18 @@ export class UserInfo extends Component {
                                     </Select> */}
                                     <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
                                     <Select
-                                        onChange={this.handleChange}
+                                        onChange={this.handleEditChange}
                                         // onChange={() => console.log('test')}
+                                        name="usertype"
+                                        value={this.state.usertype}
                                         displayEmpty
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        {useInfo.map(({ type, index }) => (
-                                            <MenuItem key={index} value={type} style={{ textTransform: 'uppercase' }}>
-                                                {type}
+                                        {useInfo.map(({ usertype, index }) => (
+                                            <MenuItem key={index} value={usertype} style={{ textTransform: 'uppercase' }}>
+                                                {usertype}
                                             </MenuItem>
                                         ))}
-                                        {console.log("---------------->", this.state.details)}
                                     </Select>
                                 </Grid>
                                 {/* <Grid helperText={setError}></Grid> */}

@@ -1,14 +1,9 @@
 import React, { Component } from 'react'
-import userInfo from './Users'
-import { v4 as uuid } from 'uuid';
-import { TableBody, MenuItem, TableCell, InputLabel, Select, TableHead, Typography, TableRow, Table } from '@mui/material';
-import NestedModal from '../components/Model';
+import { TableBody, TableCell, TableHead, Typography, TableRow, Table } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import { TextField, Grid } from '@mui/material';
-
-
 
 const style = {
     position: 'absolute',
@@ -32,7 +27,7 @@ export class UserInfo extends Component {
             open: false,
             id: '',
             usertype_id: localStorage.getItem("usertype_id") ? JSON.parse(localStorage.getItem("usertype_id")) : 0,
-            type: "",
+            usertype: "",
             explanation: "",
             error: '',
             counter: 0,
@@ -58,11 +53,11 @@ export class UserInfo extends Component {
 
 
     renderUserList() {
-        return this.state.details.length > 0 && this.state.details.map(({ type, explanation, id }) => (
+        return this.state.details.length > 0 && this.state.details.map(({ usertype, explanation, id }) => (
             <TableBody>
                 <TableRow key={id} >
                     <TableCell>{id}</TableCell>
-                    <TableCell style={{ textTransform: 'uppercase' }}>{type}</TableCell>
+                    <TableCell style={{ textTransform: 'uppercase' }}>{usertype}</TableCell>
                     <TableCell>{explanation}</TableCell>
                 </TableRow>
             </TableBody>
@@ -88,13 +83,13 @@ export class UserInfo extends Component {
         });
     };
 
-    handleChange = (e) => {
-        console.log("HI")
-        this.setState({
-            usertype: e.target.value
-        })
-        console.log("--------------->", e.target.value)
-    };
+    // handleChange = (e) => {
+    //     console.log("HI")
+    //     this.setState({
+    //         t: e.target.value
+    //     })
+    //     console.log("--------------->", e.target.value)
+    // };
 
     handleSubmit = (e) => {
         e.preventDefault()
@@ -102,13 +97,13 @@ export class UserInfo extends Component {
 
         const detail = {
             id: this.state.usertype_id + 1,
-            type: this.state.type.toUpperCase(),
+            usertype: this.state.usertype.toUpperCase(),
             explanation: this.state.explanation,
         };
         console.log('detail::--------->', detail)
         // add new detail with existing details
         // const new_values = [...this.state.details, detail]
-        const validName = this.state.details.find(x => x.type.toUpperCase() === this.state.type.toUpperCase())
+        const validName = this.state.details.find(x => x.usertype.toUpperCase() === this.state.usertype.toUpperCase())
         if (validName) {
             alert("detail already added")
         }
@@ -116,9 +111,8 @@ export class UserInfo extends Component {
             this.setState(prevState => ({
                 details: [...prevState.details, detail],
                 open: false,
-                type: "",
-                explanation: "",
                 usertype: "",
+                explanation: "",
                 usertype_id: this.state.usertype_id + 1
             }), () => {
                 localStorage.setItem("details", JSON.stringify(this.state.details));
@@ -149,7 +143,6 @@ export class UserInfo extends Component {
     // }
 
     render() {
-
         return (
             <div className='user'>
                 <div className='user-info'>
@@ -172,7 +165,7 @@ export class UserInfo extends Component {
                                     <TextField
                                         type="text"
                                         required
-                                        name="type"
+                                        name="usertype"
                                         id="type"
                                         placeholder="Enter User Type"
                                         value={this.state.type}
@@ -218,8 +211,7 @@ export class UserInfo extends Component {
                             </tr>
                         ))}
                     </TableBody> : null} */}
-
-                        {this.renderUserList()}
+                        {this.state.details.length === 0 ? <Typography>No usertype found</Typography> : this.renderUserList()}
                     </Table >
                 </div >
             </div>
